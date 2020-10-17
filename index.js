@@ -30,29 +30,23 @@ client.connect( err => {
         const Services_List = client.db(dbname).collection(collection1);
         const Admin_List = client.db(dbname).collection(collection2);
         const Order_List = client.db(dbname).collection(collection3);
-        const Review_List = client.db(dbname).collection(collection3);
+        const Review_List = client.db(dbname).collection(collection4);
     
         app.post('/addService', (req, res) => {
             
             const file = req.files.file
             const title = req.body.title
             const description = req.body.description
-            const filePath = `${__dirname}/images/${file.name}`;
-            file.mv(filePath, error => {
-                if (error) {
-                    res.status(500).send("failed")
-                }
-               const image= imgProcess(file,filePath)
+               const image= imgProcess(file)
                Services_List.insertOne({title,description,image})
                 .then(result=>{
-                 
                   res.status(200).send("Successfull")
                     })
                 
                 .catch(error=>{})
             })
             
-        })
+     
     
         app.get('/getService',(req,res)=>{
            
@@ -130,12 +124,8 @@ client.connect( err => {
             const serviceImage =req.body.image
             const status = req.body.status
            
-            const filePath = `${__dirname}/images/${file.name}`;
-            file.mv(filePath, error => {
-                if (error) {
-                    res.status(500).send("failed")
-                }
-               const image= imgProcess(file,filePath)
+           
+               const image= imgProcess(file)
                Order_List.insertOne({name,email,serviceName,description,price,image,status,serviceDescription,serviceImage})
                 .then(result=>{
                  
@@ -144,7 +134,7 @@ client.connect( err => {
                 
                 .catch(error=>{})
             })      
-        })
+       
     
     
         //review
@@ -162,7 +152,7 @@ client.connect( err => {
                 res.status(200).send("added Successfully")
             })
             .catch(err=>{
-                res.send(404).send("Failed to Inser")
+                res.status(404).send("Failed to Inser")
             })
             
         })
@@ -182,9 +172,9 @@ app.listen(5000, (req, res) => {
     
 })
 
-const imgProcess=(file,filePath)=>{
+const imgProcess=(file)=>{
     
-        const newImg = fs.readFileSync(filePath);
+        const newImg = file.data
         const encImg = newImg.toString('base64')
 
      const   img={
