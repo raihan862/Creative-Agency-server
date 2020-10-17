@@ -75,7 +75,7 @@ client.connect( err => {
         app.get('/getUserOrder',(req,res)=>{
              
             const email = req.query.email
-            Order_List.find({email:email})
+            Order_List.find({email:email},{projection:{image:0}})
             .toArray((err,document)=>{
                 res.send(document)
             })
@@ -86,13 +86,6 @@ client.connect( err => {
                 {},{projection:{serviceImage:0,image:0}}
             )
             .toArray((err,document)=>{ 
-                // const newDAta=[]
-                // document.map(data=>{
-                //     delete data.image
-                //     delete data.serviceImage
-                //     newDAta.push(data)
-                // })
-              
                 res.send(document)
                 
             })
