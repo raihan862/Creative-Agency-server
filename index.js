@@ -14,19 +14,23 @@ app.use(fileUpload())
 const uname = process.env.USER_NAME;
 const pass = process.env.PASSWORD;
 const dbname = process.env.DATABASE_NAME;
-console.log(MongoClient);
+const collection1 = process.env.COLLECTION1
+const collection2 = process.env.COLLECTION2
+const collection3 = process.env.COLLECTION3
+const collection4 = process.env.COLLECTION4
+ 
 app.get('/',(req,res)=>{
     res.send("hello")
 })
 
-const uri = "mongodb+srv://raihan:862@cluster0.5av9x.mongodb.net/Creative-Agency?retryWrites=true&w=majority";
+const uri = `mongodb+srv://${uname}:${pass}@cluster0.5av9x.mongodb.net/${dbname}?retryWrites=true&w=majority`;
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
 client.connect( err => {
-        const Services_List = client.db("Creative-Agency").collection("Services-List");
-        const Admin_List = client.db("Creative-Agency").collection("Admin-List");
-        const Order_List = client.db("Creative-Agency").collection("Order-List");
-        const Review_List = client.db("Creative-Agency").collection("Review-List");
+        const Services_List = client.db(dbname).collection(collection1);
+        const Admin_List = client.db(dbname).collection(collection2);
+        const Order_List = client.db(dbname).collection(collection3);
+        const Review_List = client.db(dbname).collection(collection3);
     
         app.post('/addService', (req, res) => {
             
@@ -51,7 +55,7 @@ client.connect( err => {
         })
     
         app.get('/getService',(req,res)=>{
-            console.log("come");
+           
             Services_List.find()
             .toArray((err,document)=>{
                 res.send(document)
@@ -84,8 +88,17 @@ client.connect( err => {
         })
     
         app.get('/getOrder',(req,res)=>{
-            Order_List.find()
-            .toArray((err,document)=>{   
+            Order_List.find(
+                {},{projection:{serviceImage:0,image:0}}
+            )
+            .toArray((err,document)=>{ 
+                // const newDAta=[]
+                // document.map(data=>{
+                //     delete data.image
+                //     delete data.serviceImage
+                //     newDAta.push(data)
+                // })
+              
                 res.send(document)
                 
             })
@@ -95,6 +108,7 @@ client.connect( err => {
     
         const id = req.params.id
         const status = req.body.status
+        
         Order_List.updateOne(
             {_id:objectid(id)},
             {
